@@ -1,5 +1,5 @@
 from flask_smorest import Blueprint
-from flask import request, session, jsonify
+from flask import session, jsonify
 from app.models.models import User
 from app.routes.v1.schema import LoginRequestSchema
 
@@ -9,11 +9,12 @@ auth = Blueprint('auth', __name__, description="Auth API")
 @auth.arguments(LoginRequestSchema, location="json") 
 @auth.response(200)
 @auth.doc(description="Login/Create User", params={})
-def login(username):
+def login(user):
     """ Login Or Create User"""
 
-    user = User.get_or_create(username)
+    user = User.get_or_create(user["username"])
     session['user'] = user.username
+    session.permanent = True
     return jsonify({"message": "Logged in", "user": user.to_dict()})
 
 @auth.route('/logout', methods=['POST'])

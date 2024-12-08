@@ -11,6 +11,8 @@ favorites = Blueprint('favorites', __name__, description="Favorites API")
 def add_favorite(character_id):
     """ Add To Favorite Characters. """
     
+    print(session.get('user'))
+
     username = session.get('user')
     if not username:
         return jsonify({"error": "Not authenticated"}), 403

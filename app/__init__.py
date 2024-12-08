@@ -1,11 +1,15 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from flask_smorest import Api
 from dotenv import load_dotenv
 
 from app.routes.v1 import auth, characters, favorites
 from app.db.mongo_manager import init_db
 
+
+
+load_dotenv()
 
 class APIConfig:
     API_TITLE = "Character Cards API"
@@ -14,8 +18,11 @@ class APIConfig:
     OPENAPI_URL_PREFIX = "/"
     OPENAPI_SWAGGER_UI_PATH = "/swagger-ui"
     OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
+    SECRET_KEY = os.getenv('SECRET_KEY', 'fallback_secret_key')
+    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = False
 
-load_dotenv()
 
 def create_app():
     
@@ -23,7 +30,7 @@ def create_app():
 
     server.config.from_object(APIConfig)
 
-    server.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
+    CORS(server, supports_credentials=True)
 
     api = Api(server)
 
