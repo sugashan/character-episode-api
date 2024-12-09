@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask
 from flask_cors import CORS
 from flask_smorest import Api
@@ -8,8 +9,10 @@ from app.routes.v1 import auth, characters, favorites
 from app.db.mongo_manager import init_db
 
 
+load_dotenv(dotenv_path='.env')
 
-load_dotenv()
+logging.basicConfig(level=logging.INFO)
+
 
 class APIConfig:
     API_TITLE = "Character Cards API"
@@ -18,10 +21,10 @@ class APIConfig:
     OPENAPI_URL_PREFIX = "/"
     OPENAPI_SWAGGER_UI_PATH = "/swagger-ui"
     OPENAPI_SWAGGER_UI_URL = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
-    SECRET_KEY = os.getenv('SECRET_KEY', 'fallback_secret_key')
-    SESSION_COOKIE_SAMESITE = 'None'
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SECURE = False
+    # SECRET_KEY = os.getenv('SECRET_KEY', 'fallback_secret_key')
+    # SESSION_COOKIE_SAMESITE = 'None'
+    # SESSION_COOKIE_HTTPONLY = True
+    # SESSION_COOKIE_SECURE = False
 
 
 def create_app():
@@ -29,6 +32,12 @@ def create_app():
     server = Flask(__name__)
 
     server.config.from_object(APIConfig)
+
+    server.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback_secret_key')
+    server.config['SESSION_COOKIE_NAME'] = 'session'
+    server.config['SESSION_COOKIE_HTTPONLY'] = True
+    server.config['SESSION_COOKIE_SECURE'] = False
+    server.config['SESSION_COOKIE_SAMESITE'] = 'None'
 
     CORS(server, supports_credentials=True)
 
@@ -39,5 +48,7 @@ def create_app():
     api.register_blueprint(favorites, url_prefix='/api/v1')
 
     init_db()
+
+    print(server.config['SECRET_KEY'])
 
     return server

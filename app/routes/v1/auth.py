@@ -14,7 +14,6 @@ def login(user):
 
     user = User.get_or_create(user["username"])
     session['user'] = user.username
-    session.permanent = True
     return jsonify({"message": "Logged in", "user": user.to_dict()})
 
 @auth.route('/logout', methods=['POST'])
